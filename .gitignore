@@ -1,0 +1,40 @@
+# ── Dependencies ──────────────────────────
+node_modules/
+ecommerce-platform/node_modules/
+backend/node_modules/
+
+# ── Build outputs ─────────────────────────
+ecommerce-platform/.next/
+ecommerce-platform/out/
+backend/dist/
+backend/build/
+
+# ── Environment files (NEVER commit these) ─
+.env
+.env.local
+.env.production
+ecommerce-platform/.env.local
+ecommerce-platform/.env.production
+backend/.env
+backend/.env.production
+
+# ── Logs ──────────────────────────────────
+backend/logs/
+*.log
+npm-debug.log*
+
+# ── OS files ──────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE files ─────────────────────────────
+.vscode/settings.json
+.idea/
+
+# ── Prisma ────────────────────────────────
+backend/prisma/migrations/
+
+# ── Misc ──────────────────────────────────
+.turbo/
+*.tsbuildinfo
