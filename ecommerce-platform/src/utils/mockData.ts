@@ -1,0 +1,91 @@
+// src/utils/mockData.ts
+import { Product } from '@/types'
+
+export const MOCK_PRODUCTS: Product[] = [
+  {
+    id: '1', name: 'Apple MacBook Pro 14" M3',
+    description: 'The most powerful MacBook Pro ever is here. With the blazing-fast M3 chip, stunning Liquid Retina XDR display, and up to 22 hours of battery life, it redefines what a pro laptop can do.',
+    price: 1999, discountPrice: 1799, stockQuantity: 12,
+    images: [
+      'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800',
+      'https://images.unsplash.com/photo-1611186871525-b6ed7b1a2228?w=800',
+    ],
+    sku: 'MBP-14-M3', isActive: true, rating: 4.8, reviewCount: 2341,
+    category: { id: 'c1', name: 'Laptops', slug: 'laptops' },
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: '2', name: 'Sony WH-1000XM5 Headphones',
+    description: 'Industry-leading noise canceling with two chips and eight microphones. Up to 30 hours battery with quick charging. Crystal clear hands-free calling.',
+    price: 399, stockQuantity: 3,
+    images: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800'],
+    sku: 'SONY-WH-XM5', isActive: true, rating: 4.6, reviewCount: 8920,
+    category: { id: 'c2', name: 'Audio', slug: 'audio' },
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: '3', name: 'iPhone 15 Pro Max 256GB',
+    description: 'iPhone 15 Pro Max. Titanium design. A17 Pro chip. 48MP Main camera with 5x optical zoom. Up to 29 hours video playback.',
+    price: 1199, discountPrice: 1099, stockQuantity: 0,
+    images: ['https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=800'],
+    sku: 'IPH-15-PM-256', isActive: true, rating: 4.9, reviewCount: 15430,
+    category: { id: 'c3', name: 'Phones', slug: 'phones' },
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: '4', name: 'Samsung 65" 4K QLED TV',
+    description: 'Quantum dot technology delivers over a billion shades of color. Neo Quantum Processor 4K. Built-in Alexa and Google Assistant.',
+    price: 1299, stockQuantity: 8,
+    images: ['https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=800'],
+    sku: 'SAM-65-QLED', isActive: true, rating: 4.5, reviewCount: 3102,
+    category: { id: 'c4', name: 'TVs', slug: 'tvs' },
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: '5', name: 'iPad Pro 12.9" M2',
+    description: 'The ultimate iPad experience with the Apple M2 chip. Stunning Liquid Retina XDR display with ProMotion technology.',
+    price: 1099, discountPrice: 999, stockQuantity: 15,
+    images: ['https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800'],
+    sku: 'IPAD-PRO-12-M2', isActive: true, rating: 4.7, reviewCount: 4210,
+    category: { id: 'c5', name: 'Tablets', slug: 'tablets' },
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: '6', name: 'DJI Mini 4 Pro Drone',
+    description: '4K/60fps video, 48MP photos, omnidirectional obstacle sensing, and up to 34 minutes flight time. Foldable and ultralight.',
+    price: 759, stockQuantity: 6,
+    images: ['https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=800'],
+    sku: 'DJI-MINI-4-PRO', isActive: true, rating: 4.8, reviewCount: 1876,
+    category: { id: 'c6', name: 'Drones', slug: 'drones' },
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: '7', name: 'Apple Watch Ultra 2',
+    description: 'The most rugged and capable Apple Watch ever. Titanium case, precision dual-frequency GPS, up to 60 hours battery life.',
+    price: 799, stockQuantity: 20,
+    images: ['https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=800'],
+    sku: 'AW-ULTRA-2', isActive: true, rating: 4.9, reviewCount: 6540,
+    category: { id: 'c7', name: 'Wearables', slug: 'wearables' },
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: '8', name: 'LG UltraWide 34" Monitor',
+    description: '34" 21:9 curved UltraWide QHD display. 160Hz refresh rate, 1ms response time, NVIDIA G-Sync compatible.',
+    price: 599, discountPrice: 499, stockQuantity: 9,
+    images: ['https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800'],
+    sku: 'LG-UW-34-QHD', isActive: true, rating: 4.6, reviewCount: 2890,
+    category: { id: 'c8', name: 'Monitors', slug: 'monitors' },
+    createdAt: new Date().toISOString(),
+  },
+]
+
+export const CATEGORIES = [
+  { id: 'c1', name: 'Laptops',   slug: 'laptops'   },
+  { id: 'c2', name: 'Audio',     slug: 'audio'     },
+  { id: 'c3', name: 'Phones',    slug: 'phones'    },
+  { id: 'c4', name: 'TVs',       slug: 'tvs'       },
+  { id: 'c5', name: 'Tablets',   slug: 'tablets'   },
+  { id: 'c6', name: 'Drones',    slug: 'drones'    },
+  { id: 'c7', name: 'Wearables', slug: 'wearables' },
+  { id: 'c8', name: 'Monitors',  slug: 'monitors'  },
+]

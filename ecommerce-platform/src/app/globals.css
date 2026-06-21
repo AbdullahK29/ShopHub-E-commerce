@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #1D9E75;
+  --color-primary-dark: #168a63;
+  --color-secondary: #7F77DD;
+  --color-danger: #D85A30;
+  --color-warning: #BA7517;
+}
+
+html { scroll-behavior: smooth; }
+button { cursor: pointer; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a1a1a1; }
