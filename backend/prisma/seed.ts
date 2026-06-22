@@ -1,18 +1,17 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import 'dotenv/config'
-import { PrismaPg } from '@prisma/adapter-pg'
+//import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient, Category } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
-const databaseUrl = process.env.DATABASE_URL
+//const databaseUrl = process.env.DATABASE_URL
 
-if (!databaseUrl) {
-  throw new Error('Missing required environment variable: DATABASE_URL')
-}
+//if (!databaseUrl) {throw new Error('Missing required environment variable: DATABASE_URL')}
 
-const prisma = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: databaseUrl }),
-})
+const prisma = new PrismaClient()
+
+  //adapter: new PrismaPg({ connectionString: databaseUrl }),
+
 
 async function main() {
   console.log('🌱 Seeding database...')
@@ -94,5 +93,5 @@ const productsData = [
 }
 
 main()
-  .catch((e: Error) => { console.error(e); process.exit(1) })
+  //.catch((e: Error) => { console.error(e); process.exit(1) })
   .finally(() => prisma.$disconnect())
