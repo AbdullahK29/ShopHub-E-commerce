@@ -6,7 +6,7 @@ import HeroCTA from '@/components/common/HeroCTA'
 async function getFeaturedProducts(): Promise<Product[]> {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/products?limit=4&sortBy=featured`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/products?limit=4&sortBy=featured`,
       {
         next: { revalidate: 1800 },
         cache: "force-cache",
@@ -24,7 +24,7 @@ async function getFeaturedProducts(): Promise<Product[]> {
 async function getCategories() {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/categories`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/categories`,
       {
         next: { revalidate: 3600 },
         cache: "force-cache",
