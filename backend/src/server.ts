@@ -23,7 +23,7 @@ import userRoutes    from './routes/users'
 const app = express()
 
 // ─── Security Middleware ──────────────────────────────────────────────────────
-
+app.set('trust proxy', 1) // ADD THIS LINE
 // Helmet sets secure HTTP headers (prevents XSS, clickjacking, etc.)
 app.use(helmet())
 
@@ -31,8 +31,8 @@ app.use(helmet())
 app.use(cors({
   origin:      env.frontendUrl,
   credentials: true,    // allow cookies
-  methods:     ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods:     ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  //allowedHeaders: ['Content-Type', 'Authorization'],
 }))
 
 // Rate limiting — max 100 requests per 15 minutes per IP
