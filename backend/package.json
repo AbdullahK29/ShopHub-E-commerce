@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "nodemon",
     "build": "prisma generate && tsc && tsc-alias",
-    "start": "node dist/index.js",
+    "start": "prisma migrate deploy && npm run db:seed && node dist/index.js",
     "db:migrate": "prisma migrate dev",
     "db:seed":    "ts-node --transpile-only -r tsconfig-paths/register prisma/seed.ts",
     "db:studio": "prisma studio",
