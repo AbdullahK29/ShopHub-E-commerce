@@ -15,34 +15,42 @@ function generateOrderNumber(): string {
 
 export const createOrder = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { shippingAddress, paymentMethod, paymentIntentId, notes } = req.body
     const userId = req.user!.id
+    const { items, shippingAddress, paymentMethod, paymentIntentId, notes } = req.body
 
-    // Get cart with items
-    const cart = await prisma.cart.findUnique({
-      where:   { userId },
-      include: { items: { include: { product: true } } }
-    })
-
-    if (!cart || cart.items.length === 0) {
+    // Validate items exist (belt-and-suspenders after Zod)
+    if (!items || items.length === 0) {
       throw new ValidationError('Cart is empty')
     }
 
-    // Calculate totals
-    const subtotal = cart.items.reduce((sum, item) => {
-      return sum + Number(item.product.discountPrice ?? item.product.price) * item.quantity
+    // Fetch real product prices from DB — never trust frontend prices for money
+    const productIds = items.map((i: any) => i.productId)
+    const products   = await prisma.product.findMany({
+      where: { id: { in: productIds } }
+    })
+
+    if (products.length !== productIds.length) {
+      throw new ValidationError('One or more products were not found')
+    }
+
+    // Map productId → product for fast lookup
+    const productMap = new Map(products.map(p => [p.id, p]))
+
+    // Calculate totals using DB prices (not frontend prices)
+    const subtotal = items.reduce((sum: number, item: any) => {
+      const product = productMap.get(item.productId)!
+      const price   = Number(product.discountPrice ?? product.price)
+      return sum + price * item.quantity
     }, 0)
 
     const shippingCost = subtotal >= 50 ? 0 : 9.99
     const tax          = subtotal * 0.08
     const totalAmount  = subtotal + shippingCost + tax
 
-    // Create order + items in a transaction
-    // Transaction = all or nothing — if any step fails, everything rolls back
     const order = await prisma.$transaction(async (tx) => {
       const newOrder = await tx.order.create({
         data: {
-          orderNumber:     generateOrderNumber(),
+          orderNumber: generateOrderNumber(),
           userId,
           totalAmount,
           subtotal,
@@ -52,17 +60,20 @@ export const createOrder = async (req: AuthRequest, res: Response, next: NextFun
           shippingAddress,
           notes,
           items: {
-            create: cart.items.map(item => ({
-              productId: item.productId,
-              quantity:  item.quantity,
-              unitPrice: Number(item.product.discountPrice ?? item.product.price),
-            }))
+            create: items.map((item: any) => {
+              const product = productMap.get(item.productId)!
+              return {
+                productId: item.productId,
+                quantity:  item.quantity,
+                unitPrice: Number(product.discountPrice ?? product.price),
+              }
+            })
           },
           ...(paymentIntentId ? {
             payment: {
               create: {
-                amount:         totalAmount,
-                status:         'PENDING',
+                amount:          totalAmount,
+                status:          'PENDING',
                 paymentMethod,
                 stripePaymentId: paymentIntentId,
               }
@@ -72,16 +83,15 @@ export const createOrder = async (req: AuthRequest, res: Response, next: NextFun
         include: { items: { include: { product: true } } }
       })
 
-      // Reduce stock for each ordered product
-      for (const item of cart.items) {
+      // Decrement stock for each ordered product
+      for (const item of items) {
         await tx.product.update({
           where: { id: item.productId },
           data:  { stockQuantity: { decrement: item.quantity } }
         })
       }
 
-      // Clear the cart after successful order
-      await tx.cartItem.deleteMany({ where: { cartId: cart.id } })
+      // No cart clearing needed — cart only exists in Redux, not in DB
 
       return newOrder
     })

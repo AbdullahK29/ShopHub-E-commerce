@@ -28,10 +28,10 @@ api.interceptors.request.use(
     }
 
     // #region agent log
-    if (typeof window !== 'undefined') {
-      const fullUrl = `${config.baseURL || ''}${config.url || ''}`
-      fetch('http://127.0.0.1:7767/ingest/ef8ca279-c086-42d0-9dbd-71b1a938091c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'80a4ff'},body:JSON.stringify({sessionId:'80a4ff',location:'api.ts:request',message:'API request',data:{method:config.method,url:config.url,baseURL:config.baseURL,fullUrl,hasDoubleApi:fullUrl.includes('/api/api/')},timestamp:Date.now(),hypothesisId:'A',runId:'pre-fix'})}).catch(()=>{});
-    }
+    //if (typeof window !== 'undefined') {
+     // const fullUrl = `${config.baseURL || ''}${config.url || ''}`
+     // fetch('http://127.0.0.1:7767/ingest/ef8ca279-c086-42d0-9dbd-71b1a938091c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'80a4ff'},body:JSON.stringify({sessionId:'80a4ff',location:'api.ts:request',message:'API request',data:{method:config.method,url:config.url,baseURL:config.baseURL,fullUrl,hasDoubleApi:fullUrl.includes('/api/api/')},timestamp:Date.now(),hypothesisId:'A',runId:'pre-fix'})}).catch(()=>{});
+    //}
     // #endregion
 
     return config

@@ -231,6 +231,7 @@ export default function CheckoutPage() {
   const router        = useRouter()
   const { showToast } = useToast()
   const cartTotal     = useAppSelector(selectCartTotal)
+  const cartItems     = useAppSelector(selectCartItems)
 
   const handleShippingNext = (address: Address) => {
     setShippingAddress(address)
@@ -241,11 +242,18 @@ export default function CheckoutPage() {
 const handlePlaceOrder = async () => {
   if (!shippingAddress) return
   setIsPlacing(true)
+
   try {
     await api.post('/orders', {
+      items: cartItems.map(i => ({
+        productId: i.product.id,
+        quantity:  i.quantity,
+        price:     Number(i.product.discountPrice ?? i.product.price),
+      })),
       shippingAddress,
       paymentMethod: 'CREDIT_CARD',
     })
+
     dispatch(clearCart())
     showToast('Order placed successfully! 🎉', 'success')
     router.push('/dashboard/orders')
