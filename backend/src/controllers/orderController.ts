@@ -15,34 +15,35 @@ function generateOrderNumber(): string {
 
 export const createOrder = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { shippingAddress, paymentMethod, paymentIntentId, notes } = req.body
     const userId = req.user!.id
 
-    // Get cart with items
-    const cart = await prisma.cart.findUnique({
-      where:   { userId },
-      include: { items: { include: { product: true } } }
-    })
+    const {
+      items,
+      shippingAddress,
+      paymentMethod,
+      paymentIntentId,
+      notes
+    } = req.body
 
-    if (!cart || cart.items.length === 0) {
+    // ✅ VALIDATION
+    if (!items || items.length === 0) {
       throw new ValidationError('Cart is empty')
     }
 
-    // Calculate totals
-    const subtotal = cart.items.reduce((sum, item) => {
-      return sum + Number(item.product.discountPrice ?? item.product.price) * item.quantity
+    // ✅ CALCULATE TOTALS (from request items)
+    const subtotal = items.reduce((sum: number, item: any) => {
+      return sum + (item.price || 0) * item.quantity
     }, 0)
 
     const shippingCost = subtotal >= 50 ? 0 : 9.99
-    const tax          = subtotal * 0.08
-    const totalAmount  = subtotal + shippingCost + tax
+    const tax = subtotal * 0.08
+    const totalAmount = subtotal + shippingCost + tax
 
-    // Create order + items in a transaction
-    // Transaction = all or nothing — if any step fails, everything rolls back
     const order = await prisma.$transaction(async (tx) => {
+
       const newOrder = await tx.order.create({
         data: {
-          orderNumber:     generateOrderNumber(),
+          orderNumber: generateOrderNumber(),
           userId,
           totalAmount,
           subtotal,
@@ -51,50 +52,56 @@ export const createOrder = async (req: AuthRequest, res: Response, next: NextFun
           paymentMethod,
           shippingAddress,
           notes,
+
           items: {
-            create: cart.items.map(item => ({
+            create: items.map((item: any) => ({
               productId: item.productId,
-              quantity:  item.quantity,
-              unitPrice: Number(item.product.discountPrice ?? item.product.price),
+              quantity: item.quantity,
+              unitPrice: item.price
             }))
           },
+
           ...(paymentIntentId ? {
             payment: {
               create: {
-                amount:         totalAmount,
-                status:         'PENDING',
+                amount: totalAmount,
+                status: 'PENDING',
                 paymentMethod,
                 stripePaymentId: paymentIntentId,
               }
             }
           } : {})
         },
-        include: { items: { include: { product: true } } }
+        include: { items: true }
       })
 
-      // Reduce stock for each ordered product
-      for (const item of cart.items) {
+      // ✅ STOCK UPDATE
+      for (const item of items) {
         await tx.product.update({
           where: { id: item.productId },
-          data:  { stockQuantity: { decrement: item.quantity } }
+          data: {
+            stockQuantity: {
+              decrement: item.quantity
+            }
+          }
         })
       }
-
-      // Clear the cart after successful order
-      await tx.cartItem.deleteMany({ where: { cartId: cart.id } })
 
       return newOrder
     })
 
     io.to(`user:${userId}`).emit('orderCreated', {
-      orderId:     order.id,
+      orderId: order.id,
       orderNumber: order.orderNumber,
-      status:      order.status,
-      total:       order.totalAmount,
+      status: order.status,
+      total: order.totalAmount,
     })
 
     sendCreated(res, order, 'Order placed successfully')
-  } catch (e) { next(e) }
+
+  } catch (e) {
+    next(e)
+  }
 }
 
 export const getOrders = async (req: AuthRequest, res: Response, next: NextFunction) => {
