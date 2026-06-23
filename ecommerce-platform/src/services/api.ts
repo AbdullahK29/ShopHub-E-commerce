@@ -1,23 +1,20 @@
 // src/services/api.ts
-// The Axios instance — the foundation of all API calls.
-// Every service imports this instead of raw axios.
+// baseURL already includes /api
+// So all calls use: api.get('/products'), api.post('/auth/login') etc
+// NEVER add /api in the call itself
 
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
-  timeout: 10000,           // fail after 10 seconds
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://shophub-e-commerce-production.up.railway.app/api',
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-// REQUEST INTERCEPTOR
-// Runs before every request is sent
-// Automatically attaches the JWT token so you never have to add it manually
 api.interceptors.request.use(
   (config) => {
-    // Get token from localStorage
     const token = typeof window !== 'undefined'
       ? localStorage.getItem('token')
       : null
@@ -25,27 +22,23 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
-
     return config
   },
   (error) => Promise.reject(error)
 )
 
-// RESPONSE INTERCEPTOR
-// Runs after every response comes back
-// Handles auth errors globally — no need to check 401 in every component
 api.interceptors.response.use(
-  (response) => response,   // success — just pass through
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid — clear storage and redirect to login
       if (typeof window !== 'undefined') {
         localStorage.removeItem('token')
+        localStorage.removeItem('refreshToken')
+        document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC'
         window.location.href = '/login'
       }
     }
 
-    // Format error message consistently
     const message =
       error.response?.data?.message ||
       error.message ||

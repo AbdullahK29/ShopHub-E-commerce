@@ -5,7 +5,7 @@ import { signToken, signRefreshToken, verifyRefreshToken } from '@/utils/jwt'
 import { sendSuccess, sendCreated } from '@/utils/response'
 import { AppError, ConflictError, UnauthorizedError } from '@/utils/AppError'
 import { AuthRequest } from '@/types'
-import { sendEmail, welcomeEmail } from '@/config/email'
+//import { sendEmail, welcomeEmail } from '@/config/email'
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -27,11 +27,11 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     })
 
     // Send welcome email in background (no await)
-    sendEmail({
-      to:      user.email,
-      subject: 'Welcome to ShopHub! 🎉',
-      html:    welcomeEmail(user.firstName),
-    })
+    // sendEmail({
+    //   to:      user.email,
+    //   subject: 'Welcome to ShopHub! 🎉',
+    //   html:    welcomeEmail(user.firstName),
+    // })
 
     const token        = signToken({ id: user.id, email: user.email, role: user.role })
     const refreshToken = signRefreshToken({ id: user.id, email: user.email, role: user.role })

@@ -6,7 +6,7 @@ import api from '@/services/api'
 
 async function getFeaturedProducts(): Promise<Product[]> {
   try {
-    const res = await api.get('/products?limit=4&sortBy=featured')
+    const res = await api.get('/products?limit=12&sortBy=featured')
     return res.data?.data?.data || []
   } catch {
     return []
