@@ -5,6 +5,7 @@ import { signToken, signRefreshToken, verifyRefreshToken } from '@/utils/jwt'
 import { sendSuccess, sendCreated } from '@/utils/response'
 import { AppError, ConflictError, UnauthorizedError } from '@/utils/AppError'
 import { AuthRequest } from '@/types'
+import { logger } from '@/config/logger'
 //import { sendEmail, welcomeEmail } from '@/config/email'
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
@@ -47,24 +48,56 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   try {
     const { email, password } = req.body
 
-    // Find user with password hash
     const user = await prisma.user.findUnique({ where: { email } })
 
-    // Intentionally vague message — don't reveal whether email exists
     if (!user) throw new UnauthorizedError('Invalid email or password')
 
     const isValid = await bcrypt.compare(password, user.passwordHash)
     if (!isValid) throw new UnauthorizedError('Invalid email or password')
 
-    const token        = signToken({ id: user.id, email: user.email, role: user.role })
-    const refreshToken = signRefreshToken({ id: user.id, email: user.email, role: user.role })
+    // #region agent log
+    logger.info('[debug-login] password valid', { email, userId: user.id, hypothesisId: 'B' })
+    // #endregion
 
-    await prisma.user.update({ where: { id: user.id }, data: { refreshToken } })
+    let token: string
+    let refreshToken: string
+    try {
+      token = signToken({ id: user.id, email: user.email, role: user.role })
+      // #region agent log
+      logger.info('[debug-login] signToken ok', { hypothesisId: 'B' })
+      // #endregion
+    } catch (e) {
+      logger.error('[debug-login] signToken failed', { error: e instanceof Error ? e.message : e })
+      throw e
+    }
 
-    const { passwordHash: _, refreshToken: __, ...safeUser } = user
+    try {
+      refreshToken = signRefreshToken({ id: user.id, email: user.email, role: user.role })
+      // #region agent log
+      logger.info('[debug-login] signRefreshToken ok', { hypothesisId: 'B' })
+      // #endregion
+    } catch (e) {
+      logger.error('[debug-login] signRefreshToken failed', { error: e instanceof Error ? e.message : e })
+      throw e
+    }
+
+    try {
+      await prisma.user.update({ where: { id: user.id }, data: { refreshToken } })
+      // #region agent log
+      logger.info('[debug-login] refreshToken saved', { hypothesisId: 'F' })
+      // #endregion
+    } catch (e) {
+      logger.error('[debug-login] refreshToken update failed', { error: e instanceof Error ? e.message : e })
+      throw e
+    }
+
+    const { passwordHash: _pw, refreshToken: _rt, ...safeUser } = user
 
     sendSuccess(res, { user: safeUser, token, refreshToken }, 'Login successful')
-  } catch (e) { next(e) }
+  } catch (e) {
+    logger.error('[debug-login] login failed', { error: e instanceof Error ? e.message : e, stack: e instanceof Error ? e.stack : undefined })
+    next(e)
+  }
 }
 
 export const logout = async (req: AuthRequest, res: Response, next: NextFunction) => {

@@ -1,6 +1,6 @@
 // src/services/productService.ts
 import api from './api'
-import { Product, PaginatedResponse, ApiResponse } from '@/types'
+import { Product, ApiResponse } from '@/types'
 
 interface GetProductsParams {
   page?:     number
@@ -14,8 +14,8 @@ interface GetProductsParams {
 }
 
 export const productService = {
-  async getAll(params: GetProductsParams = {}): Promise<PaginatedResponse<Product>> {
-    const res = await api.get<PaginatedResponse<Product>>('/products', { params })
+  async getAll(params: GetProductsParams = {}): Promise<{ data: { data: Product[]; total: number } }> {
+    const res = await api.get<{ data: { data: Product[]; total: number } }>('/products', { params })
     return res.data
   },
 

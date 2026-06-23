@@ -57,6 +57,9 @@ export default function LoginForm() {
         router.push('/dashboard')
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Login failed'
+        // #region agent log
+        fetch('http://127.0.0.1:7767/ingest/ef8ca279-c086-42d0-9dbd-71b1a938091c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'80a4ff'},body:JSON.stringify({sessionId:'80a4ff',location:'LoginForm.tsx:onSubmit:catch',message:'login failed',data:{error:message},timestamp:Date.now(),hypothesisId:'B',runId:'pre-fix'})}).catch(()=>{});
+        // #endregion
         setServerError(message)
       } finally {
         setSubmitting(false)

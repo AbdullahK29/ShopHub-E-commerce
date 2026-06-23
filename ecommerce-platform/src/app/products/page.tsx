@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import ProductCard from '@/components/Product/ProductCard'
 import { Product } from '@/types'
 import { useDebounce } from '@/hooks/useDebounce'
-import api from '@/services/api'
+import { productService } from '@/services/productService'
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -18,15 +18,21 @@ export default function ProductsPage() {
     setLoading(true)
 
     try {
-      const params = new URLSearchParams()
+      const result = await productService.getAll({
+        ...(category !== 'all' ? { category } : {}),
+        ...(debouncedSearch ? { search: debouncedSearch } : {}),
+      })
 
-      if (category !== 'all') params.append('category', category)
-      if (debouncedSearch) params.append('search', debouncedSearch)
+      const items = result.data?.data || []
+      setProducts(items)
 
-      const res = await api.get(`/api/products?${params.toString()}`)
-
-      setProducts(res.data?.data?.data || [])
-    } catch {
+      // #region agent log
+      fetch('http://127.0.0.1:7767/ingest/ef8ca279-c086-42d0-9dbd-71b1a938091c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'80a4ff'},body:JSON.stringify({sessionId:'80a4ff',location:'products/page.tsx:fetchProducts',message:'products fetched',data:{count:items.length,category,search:debouncedSearch},timestamp:Date.now(),hypothesisId:'A',runId:'pre-fix'})}).catch(()=>{});
+      // #endregion
+    } catch (err) {
+      // #region agent log
+      fetch('http://127.0.0.1:7767/ingest/ef8ca279-c086-42d0-9dbd-71b1a938091c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'80a4ff'},body:JSON.stringify({sessionId:'80a4ff',location:'products/page.tsx:fetchProducts:catch',message:'products fetch failed',data:{error:err instanceof Error?err.message:'unknown'},timestamp:Date.now(),hypothesisId:'A',runId:'pre-fix'})}).catch(()=>{});
+      // #endregion
       setProducts([])
     } finally {
       setLoading(false)

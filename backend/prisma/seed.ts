@@ -55,7 +55,7 @@ const productsData = [
   { name: 'ASUS ROG Zephyrus G14',       description: 'AMD Ryzen 9 + RTX 4060. Ultra-slim gaming laptop under 1.65kg.',                      price: 1499, discountPrice: 1299, stock: 5,  categorySlug: 'laptops',   sku: 'ASUS-ROG-G14',     rating: 4.7, reviewCount: 876,   images: ['https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800'] },
   // Audio
   { name: 'Sony WH-1000XM5',             description: 'Industry-leading noise canceling. 30hr battery, crystal clear calls.',                  price: 399,  discountPrice: null,  stock: 3,  categorySlug: 'audio',     sku: 'SONY-WH-XM5',      rating: 4.6, reviewCount: 8920,  images: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800'] },
-  { name: 'Apple AirPods Pro 2',          description: 'H2 chip, Active Noise Cancellation, Adaptive Audio, up to 30hr battery.',              price: 249,  discountPrice: 229,   stock: 25, categorySlug: 'audio',     sku: 'APP-AIRPODS-PRO2', rating: 4.8, reviewCount: 12400, images: ['https://images.unsplash.com/photo-1588423771073-b8903fead714?w=800'] },
+  { name: 'Apple AirPods Pro 2',          description: 'H2 chip, Active Noise Cancellation, Adaptive Audio, up to 30hr battery.',              price: 249,  discountPrice: 229,   stock: 25, categorySlug: 'audio',     sku: 'APP-AIRPODS-PRO2', rating: 4.8, reviewCount: 12400, images: ['https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=800'] },
   { name: 'Bose QuietComfort 45',         description: 'Legendary Bose noise cancellation. 24hr battery, comfortable all-day wear.',           price: 329,  discountPrice: 279,   stock: 9,  categorySlug: 'audio',     sku: 'BOSE-QC45',        rating: 4.5, reviewCount: 5670,  images: ['https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=800'] },
   // Phones
   { name: 'iPhone 15 Pro Max 256GB',      description: 'Titanium design. A17 Pro chip. 48MP camera with 5x optical zoom.',                    price: 1199, discountPrice: 1099,  stock: 0,  categorySlug: 'phones',    sku: 'IPH-15-PM-256',    rating: 4.9, reviewCount: 15430, images: ['https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=800'] },
@@ -76,7 +76,16 @@ const productsData = [
     const category = categories.find((c: Category) => c.slug === p.categorySlug)!
     await prisma.product.upsert({
       where:  { sku: p.sku },
-      update: {},
+      update: {
+        name: p.name,
+        description: p.description,
+        price: p.price,
+        ...(p.discountPrice ? { discountPrice: p.discountPrice } : { discountPrice: null }),
+        stockQuantity: p.stock,
+        images: p.images,
+        rating: p.rating,
+        reviewCount: p.reviewCount,
+      },
       create: {
         name: p.name, description: p.description,
         price: p.price,

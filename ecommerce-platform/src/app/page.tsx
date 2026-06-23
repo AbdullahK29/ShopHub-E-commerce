@@ -2,13 +2,21 @@ import ProductCard from '@/components/Product/ProductCard'
 import { Product } from '@/types'
 import Link from 'next/link'
 import HeroCTA from '@/components/common/HeroCTA'
+import { productService } from '@/services/productService'
 import api from '@/services/api'
 
 async function getFeaturedProducts(): Promise<Product[]> {
   try {
-    const res = await api.get('/products?limit=12&sortBy=featured')
-    return res.data?.data?.data || []
-  } catch {
+    const result = await productService.getAll({ limit: 12, sortBy: 'featured' })
+    const products = result.data?.data || []
+    // #region agent log
+    fetch('http://127.0.0.1:7767/ingest/ef8ca279-c086-42d0-9dbd-71b1a938091c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'80a4ff'},body:JSON.stringify({sessionId:'80a4ff',location:'page.tsx:getFeaturedProducts',message:'home featured products',data:{count:products.length},timestamp:Date.now(),hypothesisId:'C',runId:'pre-fix'})}).catch(()=>{});
+    // #endregion
+    return products
+  } catch (err) {
+    // #region agent log
+    fetch('http://127.0.0.1:7767/ingest/ef8ca279-c086-42d0-9dbd-71b1a938091c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'80a4ff'},body:JSON.stringify({sessionId:'80a4ff',location:'page.tsx:getFeaturedProducts:catch',message:'home featured fetch failed',data:{error:err instanceof Error?err.message:'unknown'},timestamp:Date.now(),hypothesisId:'C',runId:'pre-fix'})}).catch(()=>{});
+    // #endregion
     return []
   }
 }

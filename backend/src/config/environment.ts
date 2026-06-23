@@ -11,6 +11,13 @@ function requireEnv(key: string): string {
   return value
 }
 
+/** Railway/UI sometimes sets literal "undefined" — jwt.sign throws on that. */
+function optionalEnv(key: string, fallback: string): string {
+  const value = process.env[key]?.trim()
+  if (!value || value === 'undefined' || value === 'null') return fallback
+  return value
+}
+
 export const env = {
   port:               parseInt(process.env.PORT || '5000'),
   nodeEnv:            process.env.NODE_ENV || 'development',
@@ -19,9 +26,9 @@ export const env = {
   databaseUrl:        requireEnv('DATABASE_URL'),
 
   jwtSecret:          requireEnv('JWT_SECRET'),
-  jwtExpiresIn:       process.env.JWT_EXPIRES_IN    || '7d',
+  jwtExpiresIn:       optionalEnv('JWT_EXPIRES_IN', '7d'),
   jwtRefreshSecret:   requireEnv('JWT_REFRESH_SECRET'),
-  jwtRefreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d',
+  jwtRefreshExpiresIn: optionalEnv('JWT_REFRESH_EXPIRES_IN', '30d'),
 
   frontendUrl:        process.env.FRONTEND_URL || 'http://localhost:3000',
 

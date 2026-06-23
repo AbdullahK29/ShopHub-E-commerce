@@ -11,6 +11,7 @@ import Button from '@/components/common/Button'
 import Badge from '@/components/common/Badge'
 import { SkeletonCard } from '@/components/common/Loader'
 import { Product } from '@/types'
+import { API_BASE_URL } from '@/services/api'
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)
@@ -33,7 +34,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`)
+        const res = await fetch(`${API_BASE_URL}/products/${id}`)
         if (res.status === 404) { setNotFoundError(true); return }
         const data = await res.json()
         setProduct(data.data)

@@ -27,12 +27,23 @@ app.set('trust proxy', 1) // ADD THIS LINE
 // Helmet sets secure HTTP headers (prevents XSS, clickjacking, etc.)
 app.use(helmet())
 
-// CORS — only allow requests from our frontend
+// CORS — allow frontend origin(s)
+const allowedOrigins = [
+  env.frontendUrl,
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+].filter(Boolean)
+
 app.use(cors({
-  origin:      env.frontendUrl,
-  credentials: true,    // allow cookies
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(null, false)
+    }
+  },
+  credentials: true,
   methods:     ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  //allowedHeaders: ['Content-Type', 'Authorization'],
 }))
 
 // Rate limiting — max 100 requests per 15 minutes per IP

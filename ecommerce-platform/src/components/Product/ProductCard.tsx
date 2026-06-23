@@ -19,6 +19,8 @@ function formatPrice(price: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)
 }
 
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800'
+
 function StarRating({ rating, reviewCount }: { rating: number; reviewCount: number }) {
   return (
     <div className="flex items-center gap-1">
@@ -38,6 +40,7 @@ function StarRating({ rating, reviewCount }: { rating: number; reviewCount: numb
 export default function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [addedToCart, setAddedToCart]   = useState(false)
+  const [imgSrc, setImgSrc]             = useState(product.images[0] || FALLBACK_IMAGE)
   
   const dispatch = useAppDispatch()
   const { showToast } = useToast()
@@ -62,11 +65,12 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
       <Link href={`/products/${product.id}`}>
         <div className="relative aspect-square bg-slate-50 overflow-hidden">
           <Image
-            src={product.images[0] || '/images/placeholder.png'}
+            src={imgSrc}
             alt={product.name}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            onError={() => setImgSrc(FALLBACK_IMAGE)}
           />
           {isOnSale && (
             <div className="absolute top-3 left-3">
