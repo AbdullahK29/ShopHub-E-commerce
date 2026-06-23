@@ -238,22 +238,14 @@ export default function CheckoutPage() {
   }
 
 // Replace handlePlaceOrder with this:
-const items = useAppSelector(selectCartItems)
-
 const handlePlaceOrder = async () => {
   if (!shippingAddress) return
   setIsPlacing(true)
   try {
-    
-
-         await api.post('/orders', {
-            items: items.map(i => ({
-              productId: i.product.id,
-              quantity: i.quantity
-        })),
-  shippingAddress,
-  paymentMethod: 'CREDIT_CARD',
-   })
+    await api.post('/orders', {
+      shippingAddress,
+      paymentMethod: 'CREDIT_CARD',
+    })
     dispatch(clearCart())
     showToast('Order placed successfully! 🎉', 'success')
     router.push('/dashboard/orders')
