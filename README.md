@@ -18,12 +18,6 @@ You can log in and explore the full site without creating an account:
 
 ---
 
-## 📸 Screenshots
-
-
-| Homepage | Products | Checkout | Orders | Settings |
-|----------|----------|----------|--------|----------|
-| ![Homepage](public/screenshots/homepage.png) | ![Products](public/screenshots/products.png) | ![Checkout](public/screenshots/checkout.png) | ![Orders](public/screenshots/orders.png) | ![Settings](public/screenshots/settings.png) |
 
 ---
 
