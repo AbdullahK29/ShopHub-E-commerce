@@ -13,13 +13,12 @@ You can log in and explore the full site without creating an account:
 
 | Field    | Value             |
 |----------|-------------------|
-| Email    | `aa@gmail.com`    |
-| Password | `Azsxdcfv12@`     |
+| Email    | `demo@shophub.com`    |
+| Password | `password123`     |
 
 ---
 
 
----
 
 ## ⚙️ Tech Stack
 
